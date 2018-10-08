@@ -35,3 +35,5 @@ To run CLI commands, run
 ```shell
 go run main.go [command]
 ```
+
+or install the package to your `$GOBIN` directory with `go install` and then use `dyn-cli-utils` as above.
