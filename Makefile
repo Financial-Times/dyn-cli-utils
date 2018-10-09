@@ -8,8 +8,7 @@ NO_COLOUR = $(shell printf '%b' "\033[m")
 PACKAGES = $(shell go list ./... | grep -v /vendor/)
 DONE = printf '%b\n' ">> $(GREEN)$@ done ✓"
 
-.PHONY: docs
-docs: ## Automatically generate markdown documentation using Cobra
+docs: $(wildcard cmd/**/*.go) ## Automatically generate markdown documentation using Cobra
 	@printf '%b\n' ">> $(TEAL)generating docs"
 	go run cmd/generatedocs/generatedocs.go
 	@$(DONE)
