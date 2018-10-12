@@ -2,7 +2,7 @@
 
 ![CircleCI](https://img.shields.io/circleci/circleci/token/a3feb6b4515035e645d758ac4ddd676e1f5d2da3/project/github/Financial-Times/dyn-cli-utils/master.svg)
 
-Utilities for interacting with the dynect API.
+Utilities for interacting with the dynect API. This is not intended as a fully featured Dyn CLI client - just a collection of useful utilities which make working with Dyn easier.
 
 To install run:
 
