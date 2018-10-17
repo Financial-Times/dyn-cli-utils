@@ -1,0 +1,60 @@
+defaults: &defaults
+  docker:
+    - image: circleci/golang:1.11
+  working_directory: /go/src/github.com/Financial-Times/dyn-cli-utils
+
+version: 2
+jobs:
+  install:
+    <<: *defaults
+    steps:
+      - checkout
+
+      - restore_cache:
+          key: v1-gopkg-{{ checksum "Gopkg.lock" }}
+
+      - run:
+          name: Install dependencies
+          command: |
+            if [ ! -d  /go/src/github.com/Financial-Times/dyn-cli-utils/vendor ]; then
+                dep ensure
+            fi
+
+      - save_cache:
+          key: v1-gopkg-{{ checksum "Gopkg.lock" }}
+          paths:
+            -  /go/src/github.com/Financial-Times/dyn-cli-utils/vendor
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+  verify:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+            at: /go/src/github.com/Financial-Times/dyn-cli-utils
+
+      - run:
+          name: Check the style
+          command: make style
+
+      - run:
+          name: Vet the code
+          command: make vet
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - install
+      - verify:
+          requires:
+            - install
+
+experimental:
+  notify:
+    branches:
+      only:
+        - master
