@@ -7,7 +7,7 @@ executors:
     working_directory: /go/src/github.com/Financial-Times/dyn-cli-utils
   golang-node:
     docker:
-      - image: circleci/golang-node:1.11
+      - image: circleci/golang:1.11-node
     working_directory: /go/src/github.com/Financial-Times/dyn-cli-utils
 
 jobs:
