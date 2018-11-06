@@ -37,7 +37,7 @@ jobs:
             - .
 
   verify:
-    executor: golang
+    executor: golang-node
     steps:
       - attach_workspace:
             at: /go/src/github.com/Financial-Times/dyn-cli-utils
