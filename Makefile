@@ -31,9 +31,37 @@ vet: ## Examine the Go source code.
 	go vet $(PACKAGES)
 	@$(DONE)
 
+.PHONY:security
+security: ## Perform security scans. Needs to be run in an environment with the snyk CLI tool.
+security: _security-dependencies _security-docker
+
+_security-login:
+
+_security-login-web: ## Login to snyk if not on CI.
+	@printf '%b\n' ">> $(TEAL)Not on CI, logging into Snyk"
+	snyk auth
+
+ifeq ($(CI),)
+_security-login: _security-login-web
+endif
+
+_security-dependencies: _security-login ## Scan dependencies for security vulnerabilities.
+	@printf '%b\n' ">> $(TEAL)scanning dependencies for vulnerabilities"
+	snyk test --org=reliability-engineering
+	@$(DONE)
+
+security-monitor: ## Update latest monitored dependencies in snyk. Needs to be run in an environment with the snyk CLI tool.
+security-monitor: _security-dependencies-monitor _security-docker-monitor
+
+_security-dependencies-monitor: ## Update snyk monitored dependencies.
+	@printf '%b\n' ">> $(TEAL)updating snyk dependencies"
+	snyk monitor --org=reliability-engineering
+	@$(DONE)
+
 .PHONY: help
 help: ## Show this help message.
 	@printf '%b\n' "usage: make [target] ..."
 	@printf '%b\n' ""
 	@printf '%b\n' "targets:"
-	@grep -Eh '^.+:\ ##\ .+' ${MAKEFILE_LIST} | column -t -s ':#'
+	@# replace the first : with £ to avoid splitting columns on URLs
+	@grep -Eh '^[^_].+?:\ ##\ .+' ${MAKEFILE_LIST} | cut -d ' ' -f '1 3-' | sed 's/^(.+?):/$1/' | sed 's/:/£/' | column -t -c 2 -s '£'
