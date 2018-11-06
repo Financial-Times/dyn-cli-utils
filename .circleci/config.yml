@@ -1,12 +1,18 @@
-defaults: &defaults
-  docker:
-    - image: circleci/golang:1.11
-  working_directory: /go/src/github.com/Financial-Times/dyn-cli-utils
+version: 2.1
 
-version: 2
+executors:
+  golang:
+    docker:
+      - image: circleci/golang:1.11
+    working_directory: /go/src/github.com/Financial-Times/dyn-cli-utils
+  golang-node:
+    docker:
+      - image: circleci/golang-node:1.11
+    working_directory: /go/src/github.com/Financial-Times/dyn-cli-utils
+
 jobs:
   install:
-    <<: *defaults
+    executor: golang
     steps:
       - checkout
 
@@ -31,7 +37,7 @@ jobs:
             - .
 
   verify:
-    <<: *defaults
+    executor: golang
     steps:
       - attach_workspace:
             at: /go/src/github.com/Financial-Times/dyn-cli-utils
@@ -44,14 +50,48 @@ jobs:
           name: Vet the code
           command: make vet
 
+      - run:
+          name: Install snyk
+          command: sudo npm install -g snyk
+
+      - run:
+          name: Test dependencies for vulnerabilities
+          command: make security
+
+      - run:
+          name: Update snyk monitoring
+          command: make security-monitor
+
+  monitor:
+    executor: golang-node
+    steps:
+      - attach_workspace:
+            at: /go/src/github.com/Financial-Times/dyn-cli-utils
+
+      - run:
+          name: Install snyk
+          command: sudo npm install -g snyk
+
+      - run:
+          name: Update snyk monitoring
+          command: make security-monitor
 workflows:
-  version: 2
+  version: 2.1
   build-and-deploy:
     jobs:
       - install
       - verify:
+          context: rel-eng-creds
           requires:
             - install
+      - monitor:
+          context: rel-eng-creds
+          requires:
+            - install
+          filters:
+            branches:
+              only:
+                - master
 
 experimental:
   notify:
