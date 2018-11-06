@@ -50,8 +50,9 @@ _security-dependencies: _security-login ## Scan dependencies for security vulner
 	npx snyk test --org=reliability-engineering
 	@$(DONE)
 
+.PHONY: security-monitor
 security-monitor: ## Update latest monitored dependencies in snyk. Needs to be run in an environment with the snyk CLI tool.
-security-monitor: _security-dependencies-monitor _security-docker-monitor
+security-monitor: _security-dependencies-monitor
 
 _security-dependencies-monitor: ## Update snyk monitored dependencies.
 	@printf '%b\n' ">> $(TEAL)updating snyk dependencies"
