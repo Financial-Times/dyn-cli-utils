@@ -51,26 +51,14 @@ jobs:
           command: make vet
 
       - run:
-          name: Install snyk
-          command: sudo npm install -g snyk
-
-      - run:
           name: Test dependencies for vulnerabilities
           command: make security
-
-      - run:
-          name: Update snyk monitoring
-          command: make security-monitor
 
   monitor:
     executor: golang-node
     steps:
       - attach_workspace:
             at: /go/src/github.com/Financial-Times/dyn-cli-utils
-
-      - run:
-          name: Install snyk
-          command: sudo npm install -g snyk
 
       - run:
           name: Update snyk monitoring
