@@ -3,12 +3,10 @@ version: 2.1
 executors:
   golang:
     docker:
-      - image: circleci/golang:1.11
-    working_directory: /go/src/github.com/Financial-Times/dyn-cli-utils
+      - image: circleci/golang:1.12
   golang-node:
     docker:
-      - image: circleci/golang:1.11-node
-    working_directory: /go/src/github.com/Financial-Times/dyn-cli-utils
+      - image: circleci/golang:1.12-node
 
 jobs:
   install:
@@ -17,19 +15,16 @@ jobs:
       - checkout
 
       - restore_cache:
-          key: v1-gopkg-{{ checksum "Gopkg.lock" }}
+          key: v1-gomod-{{ checksum "go.sum" }}
 
       - run:
           name: Install dependencies
-          command: |
-            if [ ! -d  /go/src/github.com/Financial-Times/dyn-cli-utils/vendor ]; then
-                dep ensure
-            fi
+          command: go mod download
 
       - save_cache:
-          key: v1-gopkg-{{ checksum "Gopkg.lock" }}
+          key: v1-gomod-{{ checksum "go.sum" }}
           paths:
-            -  /go/src/github.com/Financial-Times/dyn-cli-utils/vendor
+            - /go/pkg/mod
 
       - persist_to_workspace:
           root: .
@@ -40,7 +35,7 @@ jobs:
     executor: golang-node
     steps:
       - attach_workspace:
-            at: /go/src/github.com/Financial-Times/dyn-cli-utils
+            at: ~/project
 
       - run:
           name: Check the style
@@ -58,11 +53,12 @@ jobs:
     executor: golang-node
     steps:
       - attach_workspace:
-            at: /go/src/github.com/Financial-Times/dyn-cli-utils
+            at: ~/project
 
       - run:
           name: Update snyk monitoring
           command: make security-monitor
+
 workflows:
   version: 2.1
   build-and-deploy:

@@ -33,15 +33,17 @@ vet: ## Examine the Go source code.
 
 .PHONY: security
 security: _security-login ## Scan dependencies for security vulnerabilities.
-	@printf '%b\n' ">> $(TEAL)scanning dependencies for vulnerabilities"
-	npx snyk test --org=reliability-engineering
-	@$(DONE)
+	# TODO: enable once snyk support go modules https://github.com/snyk/snyk/issues/354
+	# @printf '%b\n' ">> $(TEAL)scanning dependencies for vulnerabilities"
+	# npx snyk test --org=reliability-engineering
+	# @$(DONE)
 
 _security-login:
 
 _security-login-web: ## Login to snyk if not on CI.
-	@printf '%b\n' ">> $(TEAL)Not on CI, logging into Snyk"
-	npx snyk auth
+	# TODO: enable once snyk support go modules https://github.com/snyk/snyk/issues/354
+	# @printf '%b\n' ">> $(TEAL)Not on CI, logging into Snyk"
+	# npx snyk auth
 
 ifeq ($(CI),)
 _security-login: _security-login-web
@@ -49,9 +51,10 @@ endif
 
 .PHONY: security-monitor
 security-monitor: ## Update latest monitored dependencies in snyk. Needs to be run in an environment with the snyk CLI tool.
-	@printf '%b\n' ">> $(TEAL)updating snyk dependencies"
-	npx snyk monitor --org=reliability-engineering
-	@$(DONE)
+	# TODO: enable once snyk support go modules https://github.com/snyk/snyk/issues/354
+	# @printf '%b\n' ">> $(TEAL)updating snyk dependencies"
+	# npx snyk monitor --org=reliability-engineering
+	# @$(DONE)
 
 .PHONY: help
 help: ## Show this help message.
